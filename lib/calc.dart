@@ -6,21 +6,21 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  int firstNumber;
-  int secondNumber;
+  double firstNumber;
+  double secondNumber;
   String operators;
-  int result;
+  double result;
 
   operatorFunction(String oper) {
-
+    setState(() {
+      if (firstNumber == null) {
+        firstNumber = 0;
+      }
+      operators = oper;
+    });
   }
 
-  numberFunction(int number) {
-    print(number);
-    print(result);
-    print(firstNumber);
-    print(secondNumber);
-    print(operators);
+  numberFunction(double number) {
     setState(() {
       if (result != null) {
         result = null;
@@ -31,15 +31,48 @@ class _CalculatorState extends State<Calculator> {
         firstNumber = number;
         return;
       }
-      if(operators==null){
-        firstNumber = int.parse(firstNumber.toString() + number.toString());
+      if (operators == null) {
+        firstNumber = double.parse(firstNumber.toString() + number.toString());
         return;
       }
       if (secondNumber == null) {
         secondNumber = number;
         return;
       }
-      secondNumber = int.parse(secondNumber.toString() + number.toString());
+      secondNumber = double.parse(secondNumber.toString() + number.toString());
+    });
+  }
+
+  clearfunction() {
+    setState(() {
+      firstNumber = null;
+      secondNumber = null;
+      operators = null;
+      result = null;
+    });
+  }
+
+  calculateResult() {
+    setState(() {
+      switch (operators) {
+        case "+":
+          result = firstNumber + secondNumber;
+          break;
+        case "-":
+          result = firstNumber - secondNumber;
+          break;
+        case "*":
+          result = firstNumber * secondNumber;
+          break;
+        case "/":
+          result = firstNumber/secondNumber;
+          break;
+      }
+
+      operators = null;
+      secondNumber=null;
+      firstNumber = result;
+      result = null;
     });
   }
 
@@ -49,21 +82,23 @@ class _CalculatorState extends State<Calculator> {
     print(secondNumber);
     print(operators);
     // setState(() {
-      if (result != null) {
-        return result.toString();
-      }  if (secondNumber != null) {
-        var a = firstNumber.toString() + operators + secondNumber.toString();
-        return a;
-      }  if (operators != null) {
-        var a = firstNumber.toString() + operators;
-        return a;
-      }  if (firstNumber != null) {
-        print("firstnumber not null");
-        return firstNumber.toString();
-      } 
-      else {
-        return "0";
-      }
+    if (result != null) {
+      return result.toString();
+    }
+    if (secondNumber != null) {
+      var a = firstNumber.toString() + operators + secondNumber.toString();
+      return a;
+    }
+    if (operators != null) {
+      var a = firstNumber.toString() + operators;
+      return a;
+    }
+    if (firstNumber != null) {
+      print("firstnumber not null");
+      return firstNumber.toString();
+    } else {
+      return "0";
+    }
     // });
     return "0";
   }
@@ -73,9 +108,35 @@ class _CalculatorState extends State<Calculator> {
       color: Colors.black,
       height: 100.0,
       onPressed: () {
-        numberFunction(int.parse(text));
+        numberFunction(double.parse(text));
       },
       child: Text(text, style: TextStyle(color: Colors.white, fontSize: 35)),
+    );
+  }
+
+  Widget operatorbutton(String text) {
+    return FlatButton(
+      color: Colors.black,
+      height: 100.0,
+      onPressed: () {
+        if (text == "=") {
+          calculateResult();
+        } else {
+          operatorFunction(text);
+        }
+      },
+      child: Text(text, style: TextStyle(color: Colors.white, fontSize: 35)),
+    );
+  }
+
+  clearButton() {
+    return FlatButton(
+      color: Colors.black,
+      height: 100.0,
+      onPressed: () {
+        clearfunction();
+      },
+      child: Text("C", style: TextStyle(color: Colors.white, fontSize: 35)),
     );
   }
 
@@ -109,7 +170,7 @@ class _CalculatorState extends State<Calculator> {
                     button("7"),
                     button("8"),
                     button("9"),
-                    button("/"),
+                    operatorbutton("/"),
                   ]),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -117,7 +178,7 @@ class _CalculatorState extends State<Calculator> {
                     button("4"),
                     button("5"),
                     button("6"),
-                    button("*"),
+                    operatorbutton("*"),
                   ]),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -125,15 +186,15 @@ class _CalculatorState extends State<Calculator> {
                     button("1"),
                     button("2"),
                     button("3"),
-                    button("-"),
+                    operatorbutton("-"),
                   ]),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    button("C"),
+                    clearButton(),
                     button("0"),
-                    button("="),
-                    button("+"),
+                    operatorbutton("="),
+                    operatorbutton("+"),
                   ]),
             ]));
   }
